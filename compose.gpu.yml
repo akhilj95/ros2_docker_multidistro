@@ -1,0 +1,21 @@
+# ==============================================================================
+# GPU overlay — layer on top of compose.yml on machines that have an NVIDIA GPU
+# and the NVIDIA Container Toolkit installed:
+#     docker compose -f compose.yml -f compose.gpu.yml up -d
+# (the Makefile does this when you pass GPU=1).
+#
+# 'graphics,display' covers OpenGL for RViz/Gazebo; 'compute' covers CUDA.
+# You do NOT need a CUDA base image just for accelerated visualization.
+# ==============================================================================
+services:
+  ros2:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all

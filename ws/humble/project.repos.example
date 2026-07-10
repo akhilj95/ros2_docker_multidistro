@@ -1,0 +1,7 @@
+# vcstool manifest for the Humble workspace.
+# Copy this to  ws/humble/project.repos  and edit, then:  make import DISTRO=humble
+repositories:
+  # my_package:
+  #   type: git
+  #   url: https://github.com/you/my_package.git
+  #   version: main

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Minimal CycloneDDS config. Mounted read-write at ~/config in the container;
+     referenced via CYCLONEDDS_URI in .env. Uncomment/adjust the interface if
+     multicast discovery misbehaves on multi-NIC machines. -->
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain Id="any">
+    <General>
+      <Interfaces>
+        <!-- <NetworkInterface name="eth0" priority="default" multicast="default"/> -->
+      </Interfaces>
+      <AllowMulticast>default</AllowMulticast>
+    </General>
+  </Domain>
+</CycloneDDS>

@@ -1,0 +1,6 @@
+# System / released ROS debs to install ONLY in the Jazzy image.
+# One package per line. '#' comments and blank lines are ignored.
+#
+# Example — a released ROS deb (only if it exists for your distro on
+# packages.ros.org; check with `apt-cache search <name>` in the container):
+# ros-jazzy-fusioncore-ros

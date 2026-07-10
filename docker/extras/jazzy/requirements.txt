@@ -1,0 +1,3 @@
+# pip packages to install ONLY in the Jazzy image. '#' and blanks are ignored.
+#
+# kiss-icp

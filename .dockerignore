@@ -1,0 +1,26 @@
+# ==============================================================================
+# Controls the Docker BUILD CONTEXT (what `docker build` ships to the daemon).
+# The Dockerfile only COPYs from docker/, so exclude everything big or
+# irrelevant — it keeps builds fast and the cache stable.
+# ==============================================================================
+
+# ---- Version control & machine-local config ----
+.git/
+.env
+.devcontainer/
+
+# ---- Data (bags/maps/calib) and colcon caches must never reach the daemon ----
+data/
+ws/*/build/
+ws/*/install/
+ws/*/log/
+# Source is excluded too. If you enable the optional rosdep-bake COPY in the
+# Dockerfile (COPY ws/${ROS_DISTRO}/src ...), comment the next line out.
+ws/*/src/
+
+# ---- Editor / OS / Python cruft ----
+.vscode/
+.idea/
+**/__pycache__/
+**/*.py[cod]
+**/.DS_Store

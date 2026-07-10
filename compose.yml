@@ -1,0 +1,57 @@
+# ==============================================================================
+# Generic multi-distro ROS 2 workspace.
+#
+# Pick the distro with the ROS_DISTRO env var (the Makefile does this for you):
+#     ROS_DISTRO=jazzy  docker compose up -d
+#     ROS_DISTRO=humble docker compose up -d
+#
+# Because the image name, container name, and workspace mount are all keyed off
+# ${ROS_DISTRO}, different distros build to different images/containers and can
+# run side by side. Adding a distro = create ws/<distro>/src (the scripts do it
+# automatically).
+# ==============================================================================
+
+x-common: &common
+  network_mode: host          # ROS 2 discovery + host DDS; drop if you prefer a bridge network
+  ipc: host
+  stdin_open: true
+  tty: true
+  user: "${USER_UID:-1000}:${USER_GID:-1000}"
+  working_dir: /home/${USER_NAME:-ros2user}/ros2_ws
+  environment:
+    ROS_DISTRO: ${ROS_DISTRO:-humble}
+    ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
+    RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
+    CYCLONEDDS_URI: ${CYCLONEDDS_URI:-}
+    HOME: /home/${USER_NAME:-ros2user}
+    QT_X11_NO_MITSHM: 1
+    PARALLEL_WORKERS: ${PARALLEL_WORKERS:-2}
+    DISPLAY: ${DISPLAY:-}
+
+services:
+  ros2:
+    <<: *common
+    build:
+      context: .
+      # Override with DOCKERFILE=Dockerfile.<distro> if one distro needs bespoke steps.
+      dockerfile: docker/${DOCKERFILE:-Dockerfile}
+      args:
+        ROS_DISTRO: ${ROS_DISTRO:-humble}
+        USERNAME: ${USER_NAME:-ros2user}
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
+    image: ros2_ws:${ROS_DISTRO:-humble}
+    container_name: ros2_${ROS_DISTRO:-humble}
+    volumes:
+      # ---- Per-distro workspace (edit src on the host; caches inspectable) ----
+      - ./ws/${ROS_DISTRO:-humble}/src:/home/${USER_NAME:-ros2user}/ros2_ws/src
+      - ./ws/${ROS_DISTRO:-humble}/build:/home/${USER_NAME:-ros2user}/ros2_ws/build
+      - ./ws/${ROS_DISTRO:-humble}/install:/home/${USER_NAME:-ros2user}/ros2_ws/install
+      - ./ws/${ROS_DISTRO:-humble}/log:/home/${USER_NAME:-ros2user}/ros2_ws/log
+      # ---- Shared, version-controlled config ----
+      - ./config:/home/${USER_NAME:-ros2user}/config
+      # ---- One data folder for everything else (bags, maps, calib, ...) ----
+      - ${DATA_DIR:-./data}:/home/${USER_NAME:-ros2user}/data
+      # ---- Time sync + GUI passthrough ----
+      - /etc/localtime:/etc/localtime:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
